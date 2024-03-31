@@ -9,6 +9,7 @@
     "ng:start": "ng serve",
     "ng:watch": "ng build --watch --configuration development",
     "ng:test": "ng test",
+    "ng:build": "ng build",
     "prepare:bin": "node scripts/move-binary.js"
   },
   "private": false,
