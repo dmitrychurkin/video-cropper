@@ -1,0 +1,12 @@
+.container {
+    height: calc(100% - 64px);
+    display: grid;
+    place-content: center;
+}
+
+.action-container {
+    margin-top: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}

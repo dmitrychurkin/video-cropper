@@ -1,0 +1,22 @@
+<mat-nav-list ngProjectAs="nav-list">
+    @for (navItem of navItems; track navItem.name) {
+        <a
+            mat-list-item
+            #nav
+            [routerLink]="navItem.routerLink"
+            [activated]="nav._elementRef.nativeElement.classList.contains('active')"
+            routerLinkActive="active"
+            ariaCurrentWhenActive="page"
+        >
+            <mat-icon
+                matListItemIcon
+                aria-hidden="false"
+                [ariaLabel]="navItem.name"
+            >
+                {{ navItem.icon }}
+            </mat-icon>
+            <span matListItemTitle>{{ navItem.name }}</span>
+        </a>
+
+    }
+</mat-nav-list>

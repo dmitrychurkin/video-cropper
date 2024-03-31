@@ -1,0 +1,27 @@
+<div class="container">
+    @if (videoEditor.videoSource().isEmpty()) {
+        <app-video-uploader />
+    }@else {
+        <app-video-player />
+        <div class="action-container">
+            @switch (videoEditor.videoSource().getChildProcessCode()) {
+                @case (ExecStatusCode.Success) {
+                    <button
+                        mat-fab
+                        extended
+                        color="warn"
+                        (click)="save()"
+                        [disabled]="isLoading()"
+                    >
+                        <mat-icon>file_download</mat-icon>
+                        Download
+                    </button>
+                }
+
+                @default {
+                    <app-video-trimmer />
+                }
+            }
+        </div>
+    }
+</div>

@@ -1,0 +1,41 @@
+<form class="container" [formGroup]="videoTrimmerForm" (ngSubmit)="trim()">
+    <mat-form-field>
+        <mat-label>From</mat-label>
+        <input
+            matInput
+            type="number"
+            placeholder="sec"
+            formControlName="from"
+            (blur)="updateErrorMessages()"
+            required
+        />
+        @if (videoTrimmerForm.controls.from.invalid) {
+          <mat-error>{{errors.from}}</mat-error>
+        }
+    </mat-form-field>
+    <div>-</div>
+    <mat-form-field>
+        <mat-label>To</mat-label>
+        <input
+            matInput
+            type="number"
+            placeholder="sec"
+            formControlName="to"
+            (blur)="updateErrorMessages()"
+            required
+        />
+        @if (videoTrimmerForm.controls.to.invalid) {
+          <mat-error>{{errors.to}}</mat-error>
+        }
+    </mat-form-field>
+    <button
+        mat-fab
+        extended
+        type="submit"
+        color="accent"
+        [disabled]="isLoading() || !videoTrimmerForm.valid"
+    >
+        <mat-icon>content_cut</mat-icon>
+        Trim
+    </button>
+</form>
