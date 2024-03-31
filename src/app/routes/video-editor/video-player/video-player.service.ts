@@ -13,12 +13,18 @@ export class VideoPlayerService extends VideoPlayer implements IVideoPlayer {
     public override make(videoElementRef: ElementRef<HTMLVideoElement>): void {
         const videoSource = this.#videoEditor.videoSource();
 
-        this.player = videojs(videoElementRef.nativeElement, {
+        const player = videojs(videoElementRef.nativeElement, {
             sources: [videoSource.fileSrc]
+        })
+
+        player.one('loadedmetadata', () => {
+            this.#videoEditor.videoPlayer = player;
         });
+
+        this.player = player;
     }
 
     public override dispose(): void {
-        this.player.dispose();
+        this.player?.dispose();
     }
 }

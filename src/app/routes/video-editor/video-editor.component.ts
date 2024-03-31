@@ -1,13 +1,11 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { VideoUploaderComponent } from './video-uploader/video-uploader.component';
-import { VideoEditor } from './shared/video-editor';
-import { VideoEditorService } from './shared/video-editor.service';
 import { VideoPlayerComponent } from './video-player/video-player.component';
 import { VideoTrimmerComponent } from './video-trimmer/video-trimmer.component';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
+import { VideoDownloaderComponent } from './video-downloader/video-downloader.component';
+import { VideoEditor } from './shared/video-editor';
+import { VideoEditorService } from './shared/video-editor.service';
 import { ExecStatusCode } from './shared/video-editor-settings';
-import { Processor } from './shared/processor';
 
 @Component({
     selector: 'app-video-editor',
@@ -16,8 +14,7 @@ import { Processor } from './shared/processor';
         VideoUploaderComponent,
         VideoPlayerComponent,
         VideoTrimmerComponent,
-        MatButtonModule,
-        MatIconModule
+        VideoDownloaderComponent
     ],
     templateUrl: './video-editor.component.html',
     styleUrl: './video-editor.component.css',
@@ -28,11 +25,8 @@ import { Processor } from './shared/processor';
         }
     ]
 })
-export class VideoEditorComponent extends Processor {
+export class VideoEditorComponent {
     public readonly ExecStatusCode = ExecStatusCode;
-    public readonly videoEditor = inject(VideoEditor);
 
-    public save() {
-        this.process(() => this.videoEditor.saveVideoFile());
-    }
+    public readonly videoEditor = inject(VideoEditor);
 }

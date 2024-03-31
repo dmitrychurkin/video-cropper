@@ -27,7 +27,7 @@ export class VideoPlayerComponent implements AfterViewInit, OnDestroy {
 
     readonly #videoPlayer = inject(VideoPlayer);
 
-    public ngAfterViewInit() {
+    public ngAfterViewInit(): void {
         this.#videoPlayer.make(this.videoPlayer);
     }
 
