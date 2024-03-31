@@ -28,7 +28,7 @@ export class VideoTrimmerComponent extends Processor implements OnInit, OnDestro
         to: ''
     };
 
-    #$subscription!: Subscription;
+    #subscription$!: Subscription;
 
     public constructor(
         private readonly videoEditor: VideoEditor,
@@ -38,7 +38,7 @@ export class VideoTrimmerComponent extends Processor implements OnInit, OnDestro
     }
 
     public ngOnInit(): void {
-        this.#$subscription = merge(
+        this.#subscription$ = merge(
             this.videoTrimmerForm.statusChanges,
             this.videoTrimmerForm.valueChanges
         )
@@ -46,7 +46,7 @@ export class VideoTrimmerComponent extends Processor implements OnInit, OnDestro
     }
 
     public ngOnDestroy(): void {
-        this.#$subscription.unsubscribe();
+        this.#subscription$.unsubscribe();
     }
 
      // TODO: enhance validation
@@ -72,9 +72,14 @@ export class VideoTrimmerComponent extends Processor implements OnInit, OnDestro
     // TODO: revise validation messages
     public updateErrorMessages() {
         for (const name of ['from', 'to'] as const) {
-            if (this.videoTrimmerForm.controls[name].hasError('required')) {
+            const control = this.videoTrimmerForm.get(name);
+            if (!control) {
+                continue;
+            }
+
+            if (control.hasError('required')) {
                 this.errors[name] = 'You must enter a value';
-            } else if (this.videoTrimmerForm.controls[name].hasError('min')) {
+            } else if (control.hasError('min')) {
                 this.errors[name] = 'Not a valid value';
             } else {
                 this.errors[name] = '';

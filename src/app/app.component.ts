@@ -14,6 +14,4 @@ import { NavListComponent } from './components/nav-list/nav-list.component';
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })
-export class AppComponent {
-  title = 'video-cropper';
-}
+export class AppComponent { }

@@ -1,7 +1,7 @@
 import { signal } from "@angular/core";
 
 export abstract class Processor {
-    protected readonly isLoading = signal<boolean>(false);
+    public readonly isLoading = signal<boolean>(false);
 
     protected process<TArgs extends Array<any>, TResult>(
         fn: (args?: TArgs) => Promise<TResult>,
