@@ -24,6 +24,14 @@
         [disabled]="isLoading() || !videoTrimmerForm.valid"
     >
         <mat-icon>content_cut</mat-icon>
-        Trim
+        @if (isLoading()) {
+            <mat-progress-spinner
+                [diameter]="30"
+                color="warn"
+                mode="indeterminate"
+            />
+        }@else {
+            Trim
+        }
     </button>
 </form>

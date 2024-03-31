@@ -1,10 +1,11 @@
 import type { Subscription } from 'rxjs';
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, effect } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { secToMillisec } from '@app/util';
 import { Processor } from '../shared/processor';
 import { VideoEditor } from '../shared/video-editor';
@@ -19,6 +20,7 @@ import { CommonModule } from '@angular/common';
         MatInputModule,
         MatIconModule,
         MatButtonModule,
+        MatProgressSpinnerModule,
         ReactiveFormsModule,
         CommonModule
     ],
@@ -87,6 +89,14 @@ export class VideoTrimmerComponent extends Processor implements OnInit, OnDestro
         private readonly formBuilder: FormBuilder
     ) {
         super();
+
+        effect(() => {
+            if (this.isLoading()) {
+                this.videoTrimmerForm.disable();
+            }else {
+                this.videoTrimmerForm.enable();
+            }
+        });
     }
 
     public ngOnInit(): void {
