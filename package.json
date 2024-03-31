@@ -1,10 +1,11 @@
 {
   "name": "video-cropper",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "scripts": {
     "start": "npm run dev",
     "dev": "tauri dev",
     "build": "tauri build",
+    "build:debug": "tauri build --debug",
     "ng": "ng",
     "ng:start": "ng serve",
     "ng:watch": "ng build --watch --configuration development",
