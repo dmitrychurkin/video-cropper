@@ -21,9 +21,7 @@ const externalBinaryLocation = resolve(
 );
 
 const binarySet = new Set([
-    'ffmpeg',
-    'ffplay',
-    'ffprobe'
+    'ffmpeg'
 ]);
 
 let extension = '';

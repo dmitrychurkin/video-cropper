@@ -18,6 +18,8 @@ export interface VideoSource extends VideoSourceParams {
     hasResult(): boolean;
 
     getChildProcessCode(): number | null;
+
+    getVideoDuration(): number;
 };
 
 export type TrimFileSettings = {

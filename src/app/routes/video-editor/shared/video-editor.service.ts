@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
-import { extname } from '@tauri-apps/api/path';
-import { writeBinaryFile, BaseDirectory } from '@tauri-apps/api/fs';
+import { renameFile } from '@tauri-apps/api/fs';
 import { open, message, save } from '@tauri-apps/api/dialog';
 import { convertFileSrc } from '@tauri-apps/api/tauri';
 import { VideoEditor } from './video-editor';
@@ -74,11 +73,16 @@ export class VideoEditorService extends VideoEditor implements IVideoEditor {
     }
 
     public override async saveVideoFile(): Promise<void> {
-        await save({
-            defaultPath: await this.videoSource()
-                .getOutputPath(),
+        const defaultPath = await this.videoSource().getOutputPath();
+
+        const path = await save({
+            defaultPath,
             title: this.#getDialogTitle('Download trimmed file')
         });
+
+        if (path) {
+            await renameFile(defaultPath, path);
+        }
 
         this.videoSource.set(new VideoSource);
     }
