@@ -4,11 +4,11 @@
     "beforeBuildCommand": "npm run ng:build",
     "beforeDevCommand": "npm run ng:start",
     "devPath": "http://localhost:4200",
-    "distDir": "../dist"
+    "distDir": "../dist/browser"
   },
   "package": {
     "productName": "video-cropper",
-    "version": "0.3.0"
+    "version": "0.3.1"
   },
   "tauri": {
     "allowlist": {
