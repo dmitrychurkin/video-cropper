@@ -23,3 +23,17 @@ export function secToMillisec(sec: number) {
 export function pad(str: string | number, [num, pref = '00']: [number, string?]) {
     return `${pref}${str}`.slice(-num);
 };
+
+export function parseNumber(value: number | string): string {
+    const stringifiedValue = String(value).trim();
+
+    if (!stringifiedValue) {
+        return '';
+    }
+
+    if (Number.isNaN(Number.parseFloat(stringifiedValue))) {
+        return '';
+    }
+
+    return stringifiedValue.replace(/[^0-9.]/g, '');
+}

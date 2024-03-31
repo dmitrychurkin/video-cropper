@@ -12,9 +12,9 @@ export abstract class VideoEditor implements IVideoEditor {
     }
 
     public set videoPlayer(player: VideoSourceParams['player']) {
-        this.videoSource().update({
+        this.videoSource.update(videoSource => videoSource.update({
             player
-        });
+        }));
     }
 
     public abstract selectVideoFile(openDialogOptions?: OpenDialogOptions): Promise<void>;

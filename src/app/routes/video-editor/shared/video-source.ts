@@ -33,6 +33,10 @@ export class VideoSource implements IVideoSource {
         return this.childProcess?.code ?? null;
     }
 
+    public getVideoDuration(): number {
+        return this.player?.duration() || 0;
+    }
+
     public async getOutputPath(): Promise<string> {
         return resolve(
             await dirname(this.inputPath),

@@ -15,7 +15,7 @@ export class VideoPlayerService extends VideoPlayer implements IVideoPlayer {
 
         const player = videojs(videoElementRef.nativeElement, {
             sources: [videoSource.fileSrc]
-        })
+        });
 
         player.one('loadedmetadata', () => {
             this.#videoEditor.videoPlayer = player;
