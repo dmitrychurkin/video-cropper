@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, inject } from '@angular/core';
+import { Component, ViewChild, OnInit } from '@angular/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { AsyncPipe } from '@angular/common';
 import { MatToolbarModule } from '@angular/material/toolbar';
@@ -10,35 +10,38 @@ import { map, shareReplay } from 'rxjs/operators';
 import { NavigationEnd, Router } from '@angular/router';
 
 @Component({
-  selector: 'app-shell',
-  templateUrl: './app-shell.component.html',
-  styleUrl: './app-shell.component.css',
-  standalone: true,
-  imports: [
-    MatToolbarModule,
-    MatButtonModule,
-    MatSidenavModule,
-    MatIconModule,
-    AsyncPipe
-  ]
+    selector: 'app-shell',
+    templateUrl: './app-shell.component.html',
+    styleUrl: './app-shell.component.css',
+    standalone: true,
+    imports: [
+        MatToolbarModule,
+        MatButtonModule,
+        MatSidenavModule,
+        MatIconModule,
+        AsyncPipe
+    ]
 })
 export class AppShellComponent implements OnInit {
-  @ViewChild('drawer')
-  private drawer!: MatSidenav;
-  private breakpointObserver = inject(BreakpointObserver);
-  private router = inject(Router);
+    @ViewChild('drawer')
+    private readonly drawer!: MatSidenav;
 
-  isHandset$: Observable<boolean> = this.breakpointObserver.observe(Breakpoints.Handset)
-    .pipe(
-      map(result => result.matches),
-      shareReplay()
-    );
+    public constructor(
+        private readonly breakpointObserver: BreakpointObserver,
+        private readonly router: Router
+    ) {}
 
-  public ngOnInit(): void {
-    this.router.events.forEach(event => {
-      if(event instanceof NavigationEnd) {
-        this.drawer.close();
-      }
-    });
-  }
+    public readonly isHandset$: Observable<boolean> = this.breakpointObserver.observe(Breakpoints.Handset)
+        .pipe(
+            map(result => result.matches),
+            shareReplay()
+        );
+
+    public ngOnInit(): void {
+        this.router.events.forEach(event => {
+            if (event instanceof NavigationEnd) {
+                this.drawer.close();
+            }
+        });
+    }
 }
