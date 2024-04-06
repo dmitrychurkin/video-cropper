@@ -1,37 +1,61 @@
-<form class="container" [formGroup]="videoTrimmerForm" (ngSubmit)="trim()">
-    <mat-form-field>
-        <mat-label>{{InputName.From | titlecase}}</mat-label>
-        <input
-            matInput
-            placeholder="sec"
-            [formControlName]="InputName.From"
-        />
-    </mat-form-field>
-    <div>-</div>
-    <mat-form-field>
-        <mat-label>{{InputName.To | titlecase}}</mat-label>
-        <input
-            matInput
-            placeholder="sec"
-            [formControlName]="InputName.To"
-        />
-    </mat-form-field>
-    <button
-        mat-fab
-        extended
-        type="submit"
-        color="accent"
-        [disabled]="isLoading() || !videoTrimmerForm.valid"
-    >
-        <mat-icon>content_cut</mat-icon>
-        @if (isLoading()) {
-            <mat-progress-spinner
-                [diameter]="30"
-                color="warn"
-                mode="indeterminate"
+<form
+    [formGroup]="videoTrimmerForm"
+    (ngSubmit)="trim()"
+>
+    <div class="container">
+        <mat-form-field>
+            <mat-label>{{InputName.From | titlecase}}</mat-label>
+            <input
+                matInput
+                placeholder="sec"
+                [formControlName]="InputName.From"
             />
-        }@else {
-            Trim
-        }
-    </button>
+        </mat-form-field>
+        <div>-</div>
+        <mat-form-field>
+            <mat-label>{{InputName.To | titlecase}}</mat-label>
+            <input
+                matInput
+                placeholder="sec"
+                [formControlName]="InputName.To"
+            />
+        </mat-form-field>
+    </div>
+    <mat-slider
+        class="container slider"
+        [min]="min"
+        [max]="max"
+        [step]=".1"
+        [discrete]="true"
+        [showTickMarks]="true"
+    >
+        <input
+            [formControlName]="InputName.From"
+            matSliderStartThumb
+        />
+        <input
+            [formControlName]="InputName.To"
+            matSliderEndThumb
+        />
+    </mat-slider>
+    <div class="container">
+        <button
+            mat-fab
+            extended
+            type="submit"
+            color="accent"
+            [disabled]="isLoading() || !videoTrimmerForm.valid"
+        >
+            <mat-icon>content_cut</mat-icon>
+            @if (isLoading()) {
+                <mat-progress-spinner
+                    [diameter]="30"
+                    color="warn"
+                    mode="indeterminate"
+                />
+            }@else {
+                Trim
+            }
+        </button>
+    </div>
 </form>

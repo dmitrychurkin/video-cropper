@@ -1,6 +1,16 @@
+:host {
+    width: 100%;
+    padding-left: 30px;
+    padding-right: 30px;
+}
+
 .container {
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 10px;
+}
+
+.slider {
+    width: calc(100% - 20px);
 }

@@ -6,6 +6,8 @@ import { VideoDownloaderComponent } from './video-downloader/video-downloader.co
 import { VideoEditor } from './shared/video-editor';
 import { VideoEditorService } from './shared/video-editor.service';
 import { ExecStatusCode } from './shared/video-editor-settings';
+import { VideoEditorModel } from './shared/video-editor-model';
+import { VideoEditorModelService } from './shared/video-editor-model.service';
 
 @Component({
     selector: 'app-video-editor',
@@ -20,6 +22,10 @@ import { ExecStatusCode } from './shared/video-editor-settings';
     styleUrl: './video-editor.component.css',
     providers: [
         {
+            provide: VideoEditorModel,
+            useClass: VideoEditorModelService
+        },
+        {
             provide: VideoEditor,
             useClass: VideoEditorService
         }
@@ -28,5 +34,5 @@ import { ExecStatusCode } from './shared/video-editor-settings';
 export class VideoEditorComponent {
     public readonly ExecStatusCode = ExecStatusCode;
 
-    public readonly videoEditor = inject(VideoEditor);
+    public readonly model = inject(VideoEditorModel);
 }

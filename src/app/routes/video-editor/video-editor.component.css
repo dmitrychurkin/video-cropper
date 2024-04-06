@@ -1,11 +1,17 @@
 .container {
-    height: calc(100% - 64px);
+    margin-top: 20px;
     display: grid;
     place-content: center;
 }
 
+.video-uploader {
+    margin-top: initial;
+    height: calc(100% - 64px);
+}
+
 .action-container {
     margin-top: 20px;
+    margin-bottom: 20px;
     display: flex;
     align-items: center;
     justify-content: center;

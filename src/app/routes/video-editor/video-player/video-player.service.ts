@@ -1,24 +1,22 @@
-import { ElementRef, Injectable, inject } from '@angular/core';
+import { Injectable, inject, type ElementRef } from '@angular/core';
+import videojs from 'video.js';
 import { VideoPlayer } from './video-player';
 import type { VideoPlayer as IVideoPlayer } from './video-player.interface';
-import videojs from 'video.js';
-import { VideoEditor } from '../shared/video-editor';
+import { VideoEditorModel } from '../shared/video-editor-model';
 
 @Injectable({
     providedIn: 'root'
 })
 export class VideoPlayerService extends VideoPlayer implements IVideoPlayer {
-    readonly #videoEditor = inject(VideoEditor);
+    readonly #model = inject(VideoEditorModel);
 
     public override make(videoElementRef: ElementRef<HTMLVideoElement>): void {
-        const videoSource = this.#videoEditor.videoSource();
-
         const player = videojs(videoElementRef.nativeElement, {
-            sources: [videoSource.fileSrc]
+            sources: [this.#model.fileSrc]
         });
 
         player.one('loadedmetadata', () => {
-            this.#videoEditor.videoPlayer = player;
+            this.#model.player = player;
         });
 
         this.player = player;
