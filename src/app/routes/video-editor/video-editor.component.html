@@ -1,18 +1,23 @@
-<div class="container">
-    @if (videoEditor.videoSource().isEmpty()) {
+<div
+    class="container"
+    [class.video-uploader]="model.isEmpty"
+>
+    @if (model.isEmpty) {
         <app-video-uploader />
     }@else {
         <app-video-player />
-        <div class="action-container">
-            @switch (videoEditor.videoSource().getChildProcessCode()) {
-                @case (ExecStatusCode.Success) {
-                   <app-video-downloader />
-                }
-
-                @default {
-                    <app-video-trimmer />
-                }
-            }
-        </div>
     }
 </div>
+@if (!model.isEmpty) {
+    <div class="action-container">
+        @switch (model.childProcessCode) {
+            @case (ExecStatusCode.Success) {
+               <app-video-downloader />
+            }
+
+            @default {
+                <app-video-trimmer />
+            }
+        }
+    </div>
+}

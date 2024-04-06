@@ -1,19 +1,21 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { renameFile } from '@tauri-apps/api/fs';
 import { open, message, save } from '@tauri-apps/api/dialog';
 import { convertFileSrc } from '@tauri-apps/api/tauri';
 import { VideoEditor } from './video-editor';
 import type { VideoEditor as IVideoEditor } from './video-editor.interface';
 import type { OpenDialogOptions } from '@tauri-apps/api/dialog';
-import { ExecStatusCode, TrimFileSettings } from './video-editor-settings';
+import { VideoEditorModel } from './video-editor-model';
+import { ExecStatusCode, type TrimFileSettings } from './video-editor-settings';
 import { Command } from '@tauri-apps/api/shell';
-import { VideoSource } from './video-source';
 import { msToHMS } from '@app/util';
 
 @Injectable({
     providedIn: 'root'
 })
 export class VideoEditorService extends VideoEditor implements IVideoEditor {
+    readonly #model = inject(VideoEditorModel);
+
     public override async selectVideoFile({
         title = this.#getDialogTitle('Select video file'),
         filters = [
@@ -30,10 +32,10 @@ export class VideoEditorService extends VideoEditor implements IVideoEditor {
         });
 
         if (typeof inputPath === 'string') {
-            this.videoSource.set(new VideoSource({
+            this.#model.update({
                 inputPath,
                 fileSrc: convertFileSrc(inputPath)
-            }));
+            });
         }
     }
 
@@ -41,26 +43,22 @@ export class VideoEditorService extends VideoEditor implements IVideoEditor {
         startTimeMilliseconds,
         endTimeMilliseconds
     }: TrimFileSettings): Promise<void> {
-        const videoSource = this.videoSource();
-
         const command = Command.sidecar(
             'external/bin/ffmpeg',
             [
                 '-i',
-                videoSource.inputPath,
+                this.#model.inputPath,
                 '-ss',
                 msToHMS(startTimeMilliseconds),
                 '-to',
                 msToHMS(endTimeMilliseconds),
-                await videoSource.getOutputPath()
+                await this.#model.outputPath
             ]
         );
 
         const childProcess = await command.execute();
 
-        this.videoSource.update(videoSource => videoSource.update({
-            childProcess
-        }));
+        this.#model.childProcess = childProcess;
 
         if (Object.is(childProcess.code, ExecStatusCode.Success)) {
             return;
@@ -73,7 +71,7 @@ export class VideoEditorService extends VideoEditor implements IVideoEditor {
     }
 
     public override async saveVideoFile(): Promise<void> {
-        const defaultPath = await this.videoSource().getOutputPath();
+        const defaultPath = await this.#model.outputPath;
 
         const path = await save({
             defaultPath,
@@ -84,7 +82,7 @@ export class VideoEditorService extends VideoEditor implements IVideoEditor {
             await renameFile(defaultPath, path);
         }
 
-        this.videoSource.set(new VideoSource);
+        this.#model.reset();
     }
 
     #getDialogTitle(title: string) {

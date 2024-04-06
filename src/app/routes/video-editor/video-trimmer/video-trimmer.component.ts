@@ -1,16 +1,29 @@
-import type { Subscription } from 'rxjs';
-import { Component, OnInit, OnDestroy, effect } from '@angular/core';
+import { interval, type Subscription } from 'rxjs';
+import {
+    Component,
+    effect,
+    type OnInit,
+    type OnDestroy
+} from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatSliderModule } from '@angular/material/slider';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { secToMillisec } from '@app/util';
-import { Processor } from '../shared/processor';
+import { Process } from '../shared/process';
 import { VideoEditor } from '../shared/video-editor';
-import { FormControls, InputName, formValidator, inputValueNormalizer } from './input-value-helpers';
-import { CommonModule } from '@angular/common';
+import { VideoEditorModel } from '../shared/video-editor-model';
+import {
+    FormControls,
+    InputName,
+    formValidator,
+    inputValueNormalizer,
+    type MinMaxRange
+} from './input-value-helpers';
 
 @Component({
     selector: 'app-video-trimmer',
@@ -18,6 +31,7 @@ import { CommonModule } from '@angular/common';
     imports: [
         MatFormFieldModule,
         MatInputModule,
+        MatSliderModule,
         MatIconModule,
         MatButtonModule,
         MatProgressSpinnerModule,
@@ -27,13 +41,13 @@ import { CommonModule } from '@angular/common';
     templateUrl: './video-trimmer.component.html',
     styleUrl: './video-trimmer.component.css'
 })
-export class VideoTrimmerComponent extends Processor implements OnInit, OnDestroy {
+export class VideoTrimmerComponent extends Process implements MinMaxRange, OnInit, OnDestroy {
     public readonly InputName = InputName;
 
     public readonly videoTrimmerForm = this.formBuilder.group({
         [InputName.From]: [this.#initialValue],
         [InputName.To]: [this.#initialValue]
-    }, { validators: formValidator });
+    }, { validators: formValidator(this) });
 
     public get from() {
         return this.videoTrimmerForm.get(InputName.From);
@@ -41,6 +55,14 @@ export class VideoTrimmerComponent extends Processor implements OnInit, OnDestro
 
     public get to() {
         return this.videoTrimmerForm.get(InputName.To);
+    }
+
+    public get min() {
+        return this.#minMax[0];
+    }
+
+    public get max() {
+        return this.#minMax[1];
     }
 
     readonly #getNormalizedValue = (value: string) => {
@@ -74,7 +96,7 @@ export class VideoTrimmerComponent extends Processor implements OnInit, OnDestro
     get #minMax(): [number, number] {
         return [
             0,
-            this.videoEditor.videoSource().getVideoDuration()
+            this.model.videoDuration
         ];
     }
 
@@ -82,9 +104,8 @@ export class VideoTrimmerComponent extends Processor implements OnInit, OnDestro
         return '';
     }
 
-    #prevChanges: Partial<FormControls<string | null>> = {};
-
     public constructor(
+        private readonly model: VideoEditorModel,
         private readonly videoEditor: VideoEditor,
         private readonly formBuilder: FormBuilder
     ) {
@@ -93,7 +114,7 @@ export class VideoTrimmerComponent extends Processor implements OnInit, OnDestro
         effect(() => {
             if (this.isLoading()) {
                 this.videoTrimmerForm.disable();
-            }else {
+            } else {
                 this.videoTrimmerForm.enable();
             }
         });
@@ -101,6 +122,7 @@ export class VideoTrimmerComponent extends Processor implements OnInit, OnDestro
 
     public ngOnInit(): void {
         this.#subscribeValueChanges();
+        this.#presetMinMaxValues();
     }
 
     public ngOnDestroy(): void {
@@ -117,23 +139,25 @@ export class VideoTrimmerComponent extends Processor implements OnInit, OnDestro
             value[InputName.From],
             value[InputName.To]
         ]
-        .map((value, index) => Number(value || this.#minMax[index]))
-        .map(secToMillisec);
+            .map((value, index) => Number(value || this.#minMax[index]))
+            .map(secToMillisec);
 
-        this.process(() => this.videoEditor.trimVideoFile({
+        this.handle(() => this.videoEditor.trimVideoFile({
             startTimeMilliseconds,
             endTimeMilliseconds
         }));
     }
 
     #subscribeValueChanges() {
+        let prevChanges: Partial<FormControls<string | null>> = {};
+
         this.#subscriptions.push(
             this.videoTrimmerForm.valueChanges
                 .subscribe(formValues => {
                     if (Object.entries(formValues).some(([key, value]) =>
-                        this.#prevChanges[key as keyof FormControls<unknown>] !== value
+                        !Object.is(prevChanges[key as keyof FormControls<unknown>], value)
                     )) {
-                        this.#prevChanges = {
+                        prevChanges = {
                             ...formValues
                         };
 
@@ -143,6 +167,23 @@ export class VideoTrimmerComponent extends Processor implements OnInit, OnDestro
                     }
                 })
         );
+    }
+
+    #presetMinMaxValues() {
+        const subscription = interval(100).subscribe(() => {
+            this.#inputValueNormalizer.forEach(inputNormalizer =>
+                inputNormalizer({
+                    [InputName.From]: this.min,
+                    [InputName.To]: this.max
+                })
+            );
+
+            if (this.max > 0) {
+                subscription.unsubscribe();
+            }
+        });
+
+        this.#subscriptions.push(subscription);
     }
 
     #unsubscribe(): void {

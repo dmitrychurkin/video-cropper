@@ -2,7 +2,7 @@ import { Component, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { VideoEditor } from '../shared/video-editor';
-import { Processor } from '../shared/processor';
+import { Process } from '../shared/process';
 
 @Component({
   selector: 'app-video-downloader',
@@ -14,10 +14,10 @@ import { Processor } from '../shared/processor';
   templateUrl: './video-downloader.component.html',
   styleUrl: './video-downloader.component.css'
 })
-export class VideoDownloaderComponent extends Processor {
-  public readonly videoEditor = inject(VideoEditor);
+export class VideoDownloaderComponent extends Process {
+  readonly #videoEditor = inject(VideoEditor);
 
     public save() {
-        this.process(() => this.videoEditor.saveVideoFile());
+        this.handle(() => this.#videoEditor.saveVideoFile());
     }
 }

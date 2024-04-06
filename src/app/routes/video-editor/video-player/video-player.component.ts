@@ -1,4 +1,11 @@
-import { AfterViewInit, Component, ElementRef, OnDestroy, ViewChild, inject } from '@angular/core';
+import {
+    Component,
+    ViewChild,
+    inject,
+    type AfterViewInit,
+    type ElementRef,
+    type OnDestroy
+} from '@angular/core';
 import { VideoPlayer } from './video-player';
 import { VideoPlayerService } from './video-player.service';
 

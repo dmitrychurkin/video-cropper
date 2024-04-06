@@ -1,4 +1,10 @@
-import type { AbstractControl, FormControl, FormGroup, ValidationErrors, ValidatorFn } from "@angular/forms";
+import type {
+    AbstractControl,
+    FormControl,
+    FormGroup,
+    ValidationErrors,
+    ValidatorFn
+} from "@angular/forms";
 import { parseNumber } from "@app/util";
 
 export enum InputName {
@@ -6,9 +12,16 @@ export enum InputName {
     To = 'to'
 };
 
+export type Value = string | number;
+
 export type FormControls<TControl> = {
     readonly [InputName.From]: TControl;
     readonly [InputName.To]: TControl;
+};
+
+export type MinMaxRange = {
+    readonly min: number;
+    readonly max: number;
 };
 
 export const inputValueNormalizer = <TRawValue extends string>({
@@ -18,11 +31,15 @@ export const inputValueNormalizer = <TRawValue extends string>({
 }: {
     readonly inputName: InputName;
     readonly formGroup: FormGroup<FormControls<FormControl>>;
-    readonly getValue: (value: string) => string | number;
+    readonly getValue: (value: string) => Value;
 }) => (formControls: Partial<FormControls<TRawValue | null>>) => {
     const formControl = formGroup.get(inputName);
-    if (!formControl || !formControls[inputName]) {
+    if (!formControl) {
         return;
+    }
+
+    if (!formControls[inputName]) {
+        return formControl.setValue(formControls[inputName] ?? '');
     }
 
     const value = parseNumber(formControls[inputName]!);
@@ -33,7 +50,7 @@ export const inputValueNormalizer = <TRawValue extends string>({
     formControl.setValue(getValue(value));
 };
 
-export const formValidator: ValidatorFn = (
+export const formValidator = <TComponent extends MinMaxRange>(component: TComponent): ValidatorFn => (
     control: AbstractControl
 ): ValidationErrors | null => {
     const [from, to] = [
@@ -57,8 +74,9 @@ export const formValidator: ValidatorFn = (
     }
 
     if (
-        (Number(fromValue) === Number(toValue)) ||
-        (toValue && (Number(fromValue) > Number(toValue)))
+        isRangeValuesEqual([fromValue, toValue]) ||
+        isLowerRangeValueHigher([fromValue, toValue]) ||
+        isRangeValuesEqualMinMaxConstraint([fromValue, toValue], component)
     ) {
         return {
             invalidOrder: true
@@ -67,3 +85,21 @@ export const formValidator: ValidatorFn = (
 
     return null;
 };
+
+function isRangeValuesEqual([fromValue, toValue]: [Value, Value]): boolean {
+    return Object.is(Number(fromValue), Number(toValue));
+}
+
+function isLowerRangeValueHigher([fromValue, toValue]: [Value, Value]): boolean {
+    return Boolean(toValue && (Number(fromValue) > Number(toValue)));
+}
+
+function isRangeValuesEqualMinMaxConstraint<TComponent extends MinMaxRange>(
+    [fromValue, toValue]: [Value, Value],
+    { min, max }: TComponent
+): boolean {
+    return (
+        Object.is(Number(fromValue), min) &&
+        Object.is(Number(toValue), max)
+    );
+}
